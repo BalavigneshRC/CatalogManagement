@@ -1,0 +1,95 @@
+﻿@page "/edit-product/{product_ID:int}"
+
+@using CatalogManagement.Shared.Services
+@using CatalogManagement.Shared.Entities
+
+@inject ICategoryService CategoryServices
+@inject IProductServices ProductServices
+@inject IPropertyService PropertyServices
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<style>
+    .form-control {
+        width: 300px
+    }
+</style>
+
+<h3>Edit Product</h3>
+
+<form method="post">
+    <div class="row mb-3">
+        <label for="productName" class="col-sm-2 col-form-label">Product Name:</label>
+        <div class="col-sm-10">
+            <input type="text" id="productName" name="productName" @bind="@ProductName" class="form-control" required />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="price" class="col-sm-2 col-form-label">Price:</label>
+        <div class="col-sm-10">
+            <input type="number" id="price" name="price" step="0.01" @bind="@ProductPrice" class="form-control" required />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="availableStock" class="col-sm-2 col-form-label">Available Stock:</label>
+        <div class="col-sm-10">
+            <input type="number" id="availableStock" name="availableStock" @bind="@ProductStock" class="form-control" required />
+        </div>
+    </div>
+   
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <br />
+                <input type="button" class="btn btn-primary" @onclick="@UpdateProduct" value="Save" />
+                <input type="button" class="btn btn-danger" @onclick="@Cancel" value="Cancel" />
+
+                <button type="button" class="btn btn-outline-danger" @onclick="@DeleteProduct">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                        <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
+                    </svg>
+                    Deletec Product
+                </button>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+@code {
+    [Parameter]
+    public int product_ID { get; set; }
+
+    public string ProductName = string.Empty;
+    public float ProductPrice;
+    public int ProductStock = 0;
+
+    Products product = new Products();
+
+    protected override async Task OnInitializedAsync()
+    {
+        product = await Task.Run(() => ProductServices.GetProductByID(product_ID));
+
+        ProductName = product.Product_Name;
+        ProductPrice = product.Price;
+        ProductStock = product.Available_Stock;
+    }
+    protected async void UpdateProduct()
+    {
+        product.Product_Name = ProductName;
+        product.Price = ProductPrice;
+        product.Available_Stock = ProductStock;
+        await ProductServices.UpdateProduct(product);
+        NavigationManager.NavigateTo("view-product/" + product_ID);
+    }
+    protected async void DeleteProduct()
+    {
+        await ProductServices.RemoveProduct(product_ID);
+        NavigationManager.NavigateTo("products/"+product.Category_ID);
+    }
+
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("view-product/" + product_ID);
+    }
+}

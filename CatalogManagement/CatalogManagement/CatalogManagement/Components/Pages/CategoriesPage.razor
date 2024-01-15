@@ -1,0 +1,184 @@
+﻿@page "/"
+@page "/categories"
+@using CatalogManagement.Shared.Services
+@using CatalogManagement.Shared.Entities
+@inject ICategoryService CategoryServices
+@inject NavigationManager NavigationManager
+
+@attribute [StreamRendering(true)]
+<PageTitle>Categories</PageTitle>
+
+<style>
+    .header {
+        width: 100%;
+        padding: 10px 0px 10px 20px;
+        background-color: #cfd4d8;
+    }
+
+    .header-content {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+
+    h1 {
+        margin-bottom: 0px;
+    }
+
+    .category-container {
+        margin-top:20px;
+        display: flex;
+        flex-direction:row;
+        flex-wrap: wrap;
+        row-gap: 40px;
+        column-gap: 50px;
+        justify-content: flex-start;
+    }
+
+    .category-content{
+        flex: 1 1 338px; 
+        min-height: 200px;
+        min-width: 200px;
+        max-width: 300px;
+        max-height: 200px;
+        box-sizing: border-box;
+    }
+
+    .loading-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh
+    }
+
+    .panel  {
+        width:100%;
+        height:100%;
+    }
+
+    .panel-heading {
+        width:100%;
+        padding:10px;
+        background-color: #0d6efd;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .panel-body {
+        width: 100%;
+        height: 80%;
+        border: 2px solid #0d6efd;
+        box-sizing: border-box;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        overflow: hidden;
+    }
+
+    .keyword-background {
+        width: 300px;
+        height: 200px;
+    }
+
+    .add-tile {
+        width: 100%;
+        height: 100%;
+        min-height: 200px;
+        min-width: 200px;
+        max-width: 338px;
+        max-height: 200px;
+        border-radius: 10px;
+        background-color: #cfd4d8;
+        border: 2px solid #0d6efd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 50px;
+    }
+    .nav-icon-container{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .loading{
+        height:20px;
+        width:20px;
+    }
+
+</style>
+
+<div class="header">
+  <div class="header-content">
+    <h1>Categories</h1>      
+  </div>
+</div>
+<div class="category-container">
+    @if (categories == null)
+    {
+        <div class="loading-container" role="status">
+            <div class="loading">
+                <svg aria-hidden="true" class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
+                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
+                </svg>
+            </div>
+        </div>
+    }
+    else if (categories.Count == 0)
+    {
+        <h1 class="text-danger">No Categories Available.</h1>
+    }
+    else
+    {
+        @foreach (var category in categories)
+        {
+            <div class="category-content">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <span style="color: #ffffff; ">@category.Category_Name</span>
+                        @{
+                            string edit_route = "edit-category/" + category.Category_ID;
+                            string view_route = "products/" + category.Category_ID;
+                        }
+                        <NavLink style="float:right" href="@edit_route">
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+                                </svg>
+                            </span>
+                        </NavLink>
+                    </div>
+                    <div class="panel-body">
+                         <NavLink style="width:100%;height:100%;" href="@view_route">
+                            <div style="width: 100%; height: 100%;" class="nav-icon-container">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
+                                  <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                                  <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54L1 12.5v-9a.5.5 0 0 1 .5-.5z"/>
+                                </svg>
+                            </div>
+                        </NavLink>
+                    </div>                   
+                </div>
+            </div>
+        }
+        <div class="category-content">
+            <NavLink style="width:100%;height:100%;" href="add-category">
+                <div class="add-tile">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                    </svg>
+                </div>
+            </NavLink>
+        </div>
+    }
+    
+</div>
+
+@code{
+    List<Categories> categories = null;
+
+    protected override async Task OnInitializedAsync(){
+        categories = await CategoryServices.GetCategories();
+    }
+
+}

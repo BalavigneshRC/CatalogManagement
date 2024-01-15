@@ -1,0 +1,80 @@
+﻿@page "/add-product/{categoryId:int}"
+
+@using CatalogManagement.Shared.Services
+@using CatalogManagement.Shared.Entities
+
+@inject ICategoryService CategoryServices
+@inject IProductServices ProductServices
+@inject IPropertyService PropertyServices
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<style>
+    .form-control{
+        width:300px
+    }
+</style>
+
+<h3>Add New Product</h3>
+
+<form method="post">
+    <div class="row mb-3">
+        <label for="productName" class="col-sm-2 col-form-label">Product Name:</label>
+        <div class="col-sm-10">
+            <input type="text" id="productName" name="productName" @bind="@product.Product_Name" class="form-control" required />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="price" class="col-sm-2 col-form-label">Price:</label>
+        <div class="col-sm-10">
+            <input type="number" id="price" name="price" step="0.01" @bind="@product.Price" class="form-control" required />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="availableStock" class="col-sm-2 col-form-label">Available Stock:</label>
+        <div class="col-sm-10">
+            <input type="number" id="availableStock" name="availableStock" @bind="@product.Available_Stock" class="form-control" required />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <br />
+                <input type="button" class="btn btn-primary" @onclick="@CreateNewProduct" value="Add" />
+                <input type="button" class="btn btn-danger" @onclick="@Cancel" value="Cancel" />
+                <button type="button" class="btn btn-outline-primary" @onclick="@AddNewProperty">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-plus-fill" viewBox="0 0 16 16">
+                        <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M8.5 7v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 1 0" />
+                    </svg>
+                    Add Property
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@code {
+    [Parameter]
+    public int categoryId { get; set; }
+
+    Products product = new Products();
+
+    protected async void CreateNewProduct()
+    {
+        product.Category_ID = categoryId;
+        await ProductServices.AddProduct(product);
+        NavigationManager.NavigateTo("products");
+    }
+
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("products");
+    }
+
+    protected async void AddNewProperty()
+    {
+        product.Category_ID = categoryId;
+        await ProductServices.AddProduct(product);
+        NavigationManager.NavigateTo("add-property/" + product.Product_ID);
+    }
+}

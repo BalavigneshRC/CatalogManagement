@@ -1,0 +1,44 @@
+﻿@page "/add-category"
+@using CatalogManagement.Shared.Services
+@using CatalogManagement.Shared.Entities
+@inject ICategoryService CategoryServices
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h3>Add New Category</h3>
+
+<form>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="for-group">
+                <label for="CategoryyName" class="control-label"><strong>Category Name</strong></label>
+                <input form="CategoryyName" class="form-control" @bind="@categoryObj.Category_Name"/>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <br />
+                <input type="button" class="btn btn-primary" @onclick="@CreateNewCategory" value="Add"/>
+
+                <input type="button" class="btn btn-danger" @onclick="@Cancel" value="Cancel" />
+            </div>
+        </div>
+    </div>
+</form>
+
+@code {
+    Categories categoryObj = new Categories();
+
+    protected async void CreateNewCategory()
+    {
+        await CategoryServices.AddCategory(categoryObj);
+        NavigationManager.NavigateTo("categories");
+    }
+
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("categories");
+    }
+}

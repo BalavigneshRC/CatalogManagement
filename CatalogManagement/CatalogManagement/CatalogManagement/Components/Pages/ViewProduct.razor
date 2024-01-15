@@ -1,0 +1,179 @@
+﻿@page "/view-product/{product_ID:int}"
+
+@using CatalogManagement.Shared.Services
+@using CatalogManagement.Shared.Entities
+
+@inject IProductServices ProductServices
+@inject IPropertyService PropertyServices
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<style>
+    .header {
+        width: 100%;
+        background-color: #cfd4d8;
+    }
+
+    .property-row {
+        padding: 10px 0px 10px 20px;
+        border-radius: 10px;
+    }
+
+    .header-content {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        padding: 10px 0px 10px 0px;
+        display:flex;
+        flex-direction:row;
+        column-gap:20px
+    }
+
+    .loading-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh
+    }
+
+    h1 {
+        margin-bottom: 0px;
+    }
+
+    .edit-icon{
+        display:flex;
+        align-items:center;
+        justify-content:left
+    }
+
+    .row{
+        padding: 10px 0px 10px 20px;
+    }
+
+    .col-md-3 .col-md-9{
+        width:200px;
+    }
+    .col-md-8{
+        width:100px
+    }
+    .col-md-5{
+        width:200px
+    }
+</style>
+<div class="container">
+    @if (product == null)
+    {
+        <div class="loading-container" role="status">
+            <div class="loading">
+                <svg aria-hidden="true" class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
+                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
+                </svg>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row mb-3">
+            <div class="header">
+                <div class="header-content">
+                    <h2>Product Detail</h2>
+                    <div>
+                        @{
+                            string edit_route = "edit-product/" + product_ID;
+                        }
+                        <NavLink href="@edit_route">
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#0d6efd" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+                                </svg>
+                            </span>
+                        </NavLink>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <strong>Product Name:</strong>
+            </div>
+            <div class="col-md-9">
+                @product.Product_Name
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <strong>Price:</strong>
+            </div>
+            <div class="col-md-9">
+                @product.Price.ToString("C")
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <strong>Available Stock:</strong>
+            </div>
+            <div class="col-md-9">
+                @product.Available_Stock
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="header">
+                <div class="header-content">
+                    <h2>Product Detail</h2>
+                    <button type="button" class="btn btn-outline-primary" @onclick="@AddNewProperty">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-plus-fill" viewBox="0 0 16 16">
+                            <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M8.5 7v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 1 0" />
+                        </svg>
+                        Add Property
+                    </button>
+                </div>
+            
+            </div>
+        </div>
+        @foreach (var property in properties)
+        {
+            <div class="row mb-2 property-row">
+                <div class="col-md-5">
+                    <strong>@property.Property_Name:</strong>
+                </div>
+                <div class="col-md-5">
+                    @property.Property_Value
+                </div>
+                <div class="col-md-8">
+                    @{
+                        string edit_property_route = "edit-properties/" + property.Property_ID;
+                    }
+                    <NavLink href="@edit_property_route">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#0d6efd" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+                            </svg>
+                        </span>
+                    </NavLink>
+                </div>
+            </div>
+        }
+    }
+    
+</div>
+@code {
+    [Parameter]
+    public int product_ID { get; set; }
+    Products product;
+    private int categoryID { get; set; } = 1;
+    List<Properties> properties;
+
+    protected override async Task OnInitializedAsync()
+    {
+        product = await Task.Run(() => ProductServices.GetProductByID(product_ID));
+        properties = await Task.Run(() => PropertyServices.GetPropertyByProduct(product_ID));
+    }
+    void AddNewProperty()
+    {
+        NavigationManager.NavigateTo("add-property/" + product.Product_ID);
+    }
+}

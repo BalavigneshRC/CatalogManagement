@@ -1,0 +1,71 @@
+﻿@page "/edit-category/"
+@page "/edit-category/{Id:int}"
+@using CatalogManagement.Shared.Services
+@using CatalogManagement.Shared.Entities
+
+@inject ICategoryService CategoryServices
+@inject IProductServices ProductServices
+@inject IPropertyService PropertyServices
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h3>Edit Category</h3>
+
+<form>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="for-group">
+                <label for="CategoryyName" class="control-label"><strong>Category Name</strong></label>
+                <input form="CategoryName" class="form-control" @bind="@categoryName" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <br />
+                <input type="button" class="btn btn-primary" @onclick="@UpdateCategory" value="Save" />
+
+                <input type="button" class="btn btn-danger" @onclick="@Cancel" value="Cancel" />
+
+                <button type="button" class="btn btn-outline-danger" @onclick="@DeleteCategory">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                        <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
+                    </svg>
+                    DeleteCategory
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@code {
+
+    [Parameter]
+    public int Id{ get; set; }
+    string categoryName = string.Empty;
+    string categoryDescription = string.Empty;
+    Categories categoryObj = new Categories();
+
+    protected override async Task OnInitializedAsync()
+    {
+        categoryObj = await Task.Run(() => CategoryServices.GetCategoryByID(Id));
+        categoryName = categoryObj.Category_Name;
+    }
+    protected async void UpdateCategory()
+    {
+        categoryObj.Category_Name = categoryName;
+        await CategoryServices.UpdateCategory(categoryObj);
+        NavigationManager.NavigateTo("Categories");
+    }
+    protected async void DeleteCategory()
+    {
+        await CategoryServices.RemoveCategory(Id);
+        NavigationManager.NavigateTo("Categories");
+    }
+
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("Categories");
+    }
+}

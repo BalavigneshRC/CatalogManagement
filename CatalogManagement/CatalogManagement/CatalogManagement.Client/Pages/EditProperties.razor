@@ -1,0 +1,85 @@
+﻿@page "/edit-properties/{property_ID:int}"
+
+
+@using CatalogManagement.Shared.Services
+@using CatalogManagement.Shared.Entities
+
+@inject IPropertyService PropertyServices
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<style>
+    .form-control {
+        width: 300px
+    }
+</style>
+
+<h3>Edit Property</h3>
+
+<form method="post">
+    <div class="row mb-3">
+        <label for="propertyName" class="col-sm-2 col-form-label">Property Name:</label>
+        <div class="col-sm-10">
+            <input type="text" id="propertyName" name="propertyName" @bind="@property_Name" class="form-control" required />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="propertyValue" class="col-sm-2 col-form-label">Property Value:</label>
+        <div class="col-sm-10">
+            <input type="text" id="propertyValue" name="propertyValue" @bind="@property_Value" class="form-control" required />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <br />
+                <input type="button" class="btn btn-primary" @onclick="@UpdateProperty" value="Save" />
+                <input type="button" class="btn btn-danger" @onclick="@Cancel" value="Cancel" />
+                <button type="button" class="btn btn-outline-danger" @onclick="@DeleteProperty">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                        <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
+                    </svg>
+                    Delete Property
+                </button>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+@code {
+    [Parameter]
+    public int property_ID { get; set; }
+
+    public string property_Name = string.Empty;
+    public string property_Value = string.Empty;
+
+    Properties properties = new Properties();
+
+    protected override async Task OnInitializedAsync()
+    {
+        properties = await Task.Run(() => PropertyServices.GetPropertyByID(property_ID));
+        if (properties != null)
+        {
+            property_Name = properties.Property_Name;
+            property_Value = properties.Property_Value;
+        }
+    }
+    protected async void UpdateProperty()
+    {
+        properties.Property_Name = property_Name;
+        properties.Property_Value = property_Value;
+        await PropertyServices.UpdateProperty(properties);
+        NavigationManager.NavigateTo("view-product/" + properties.Product_ID);
+    }
+    protected async void DeleteProperty()
+    {
+        await PropertyServices.RemoveProperty(property_ID);
+        NavigationManager.NavigateTo("view-product/" + properties.Product_ID);
+    }
+
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("view-product/" + properties.Product_ID);
+    }
+}

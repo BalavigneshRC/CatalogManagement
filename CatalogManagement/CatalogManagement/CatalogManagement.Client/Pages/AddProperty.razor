@@ -1,0 +1,60 @@
+﻿@page "/add-property/{product_ID:int}"
+
+@using CatalogManagement.Shared.Services
+@using CatalogManagement.Shared.Entities
+
+@inject IPropertyService PropertyServices
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<style>
+    .form-control{
+        width:300px
+    }
+</style>
+
+<h3>Add New Property</h3>
+
+<form method="post">
+    <div class="row mb-4">
+        <label for="propertyName" class="col-sm-2 col-form-label">Property Name:</label>
+        <div class="col-sm-10">
+            <input type="text" id="propertyName" name="propertyName" @bind="@property.Property_Name" class="form-control" required />
+        </div>
+    </div>
+    <div class="row mb-5">
+        <label for="propertyValue" class="col-sm-2 col-form-label">Property Value:</label>
+        <div class="col-sm-10">
+            <input type="text" id="propertyValue" name="propertyValue" @bind="@property.Property_Value" class="form-control" required />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <br />
+                <input type="button" class="btn btn-primary" @onclick="@CreateNewProperty" value="Add" />
+                <input type="button" class="btn btn-danger" @onclick="@Cancel" value="Cancel" />
+            </div>
+        </div>
+    </div>
+</form>
+
+@code {
+    [Parameter]
+    public int product_ID { get; set; }
+
+    Properties property = new Properties();
+
+    protected async void CreateNewProperty()
+    {
+        property.Product_ID = product_ID;
+        await PropertyServices.AddProperty(property);
+        NavigationManager.NavigateTo("view-product/" + product_ID);
+    }
+
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("view-product/" + product_ID);
+    }
+}
