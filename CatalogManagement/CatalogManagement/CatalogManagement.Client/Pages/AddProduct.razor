@@ -63,12 +63,12 @@
     {
         product.Category_ID = categoryId;
         await ProductServices.AddProduct(product);
-        NavigationManager.NavigateTo("products");
+        NavigationManager.NavigateTo("products/" + categoryId);
     }
 
     void Cancel()
     {
-        NavigationManager.NavigateTo("products");
+        NavigationManager.NavigateTo("products/" + categoryId);
     }
 
     protected async void AddNewProperty()
